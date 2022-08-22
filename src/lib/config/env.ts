@@ -79,6 +79,7 @@ export function hubspotDealConfigFromENV(): HubspotDealConfig {
       associatedPartner: optional('HUBSPOT_DEAL_ASSOCIATED_PARTNER'),
       duplicateOf: optional('HUBSPOT_DEAL_DUPLICATEOF_ATTR'),
       maintenanceEndDate: optional('HUBSPOT_DEAL_MAINTENANCE_END_DATE_ATTR'),
+      maintenanceStartDate: optional('HUBSPOT_DEAL_MAINTENANCE_START_DATE_ATTR'),
       billingPeriod: optional('HUBSPOT_DEAL_Billing_Period'),
       saleType: optional('HUBSPOT_DEAL_SALE_TYPE_ATTR'),
     },
@@ -152,5 +153,4 @@ function requireOneOf<T>(opts: T[]): T {
 
   const { localKey, value } = firstValid;
   return { [localKey]: value } as unknown as T;
-<<<<<<< HEAD
 }
