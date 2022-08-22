@@ -1,13 +1,13 @@
-import assert from 'assert';
-import dotenv from 'dotenv';
-import { DataShiftConfig } from '../data-shift/analyze';
-import { EngineConfig } from '../engine/engine';
-import { HubspotCreds } from '../hubspot/api';
-import { MultiMpacCreds } from '../marketplace/api';
-import { MpacConfig } from '../marketplace/marketplace';
-import { HubspotContactConfig } from '../model/contact';
-import { HubspotDealConfig } from '../model/deal';
-import { RunLoopConfig } from '../util/runner';
+import assert from "assert";
+import dotenv from "dotenv";
+import { DataShiftConfig } from "../data-shift/analyze";
+import { EngineConfig } from "../engine/engine";
+import { HubspotCreds } from "../hubspot/api";
+import { MultiMpacCreds } from "../marketplace/api";
+import { MpacConfig } from "../marketplace/marketplace";
+import { HubspotContactConfig } from "../model/contact";
+import { HubspotDealConfig } from "../model/deal";
+import { RunLoopConfig } from "../util/runner";
 
 dotenv.config();
 
@@ -80,9 +80,7 @@ export function hubspotDealConfigFromENV(): HubspotDealConfig {
       maintenanceEndDate: optional('HUBSPOT_DEAL_MAINTENANCE_END_DATE_ATTR'),
       saleType: optional('HUBSPOT_DEAL_SALE_TYPE_ATTR'),
     },
-    managedFields: new Set(
-      optional('HUBSPOT_MANAGED_DEAL_FIELDS')?.split(/\s*,\s*/g) ?? []
-    ),
+    managedFields: new Set(optional('HUBSPOT_MANAGED_DEAL_FIELDS')?.split(/\s*,\s*/g) ?? []),
   };
 }
 
@@ -98,33 +96,25 @@ export function hubspotContactConfigFromENV(): HubspotContactConfig {
       contactType: optional('HUBSPOT_CONTACT_CONTACT_TYPE_ATTR'),
       region: optional('HUBSPOT_CONTACT_REGION_ATTR'),
       relatedProducts: optional('HUBSPOT_CONTACT_RELATED_PRODUCTS_ATTR'),
-      lastAssociatedPartner: optional(
-        'HUBSPOT_CONTACT_LAST_ASSOCIATED_PARTNER'
-      ),
+      lastAssociatedPartner: optional('HUBSPOT_CONTACT_LAST_ASSOCIATED_PARTNER'),
     },
-    managedFields: new Set(
-      optional('HUBSPOT_MANAGED_CONTACT_FIELDS')?.split(/\s*,\s*/g) ?? []
-    ),
+    managedFields: new Set(optional('HUBSPOT_MANAGED_CONTACT_FIELDS')?.split(/\s*,\s*/g) ?? []),
   };
 }
 
 export function mpacConfigFromENV(): MpacConfig {
   return {
-    ignoredEmails: new Set(
-      (optional('IGNORED_EMAILS')?.split(',') ?? []).map((e) => e.toLowerCase())
-    ),
+    ignoredEmails: new Set((optional('IGNORED_EMAILS')?.split(',') ?? []).map(e => e.toLowerCase())),
   };
 }
 
 export function engineConfigFromENV(): EngineConfig {
   return {
-    partnerDomains: new Set(
-      optional('PARTNER_DOMAINS')?.split(/\s*,\s*/g) ?? []
-    ),
+    partnerDomains: new Set(optional('PARTNER_DOMAINS')?.split(/\s*,\s*/g) ?? []),
     appToPlatform: Object.fromEntries<string>(
       required('ADDONKEY_PLATFORMS')
         .split(',')
-        .map((kv) => kv.split('=') as [string, string])
+        .map(kv => kv.split('=') as [string, string])
     ),
     archivedApps: new Set(optional('IGNORED_APPS')?.split(',') ?? []),
     dealProperties: {
@@ -149,19 +139,14 @@ function optional(key: string) {
 }
 
 function requireOneOf<T>(opts: T[]): T {
-  const all = opts.flatMap((opt) =>
-    Object.entries(opt).map(([localKey, envKey]) => ({
-      localKey,
-      envKey,
-      value: process.env[envKey],
-    }))
-  );
+  const all = opts.flatMap(opt => Object.entries(opt).map(([localKey, envKey]) => ({
+    localKey,
+    envKey,
+    value: process.env[envKey],
+  })));
 
-  const firstValid = all.find((opt) => opt.value);
-  assert.ok(
-    firstValid,
-    `One of ENV keys ${all.map((o) => o.envKey).join(' or ')} are required`
-  );
+  const firstValid = all.find(opt => opt.value);
+  assert.ok(firstValid, `One of ENV keys ${all.map(o => o.envKey).join(' or ')} are required`);
 
   const { localKey, value } = firstValid;
   return { [localKey]: value } as unknown as T;
