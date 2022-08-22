@@ -79,6 +79,7 @@ export function hubspotDealConfigFromENV(): HubspotDealConfig {
       associatedPartner: optional('HUBSPOT_DEAL_ASSOCIATED_PARTNER'),
       duplicateOf: optional('HUBSPOT_DEAL_DUPLICATEOF_ATTR'),
       maintenanceEndDate: optional('HUBSPOT_DEAL_MAINTENANCE_END_DATE_ATTR'),
+      billingPeriod: optional('HUBSPOT_DEAL_Billing_Period'),
     },
     managedFields: new Set(optional('HUBSPOT_MANAGED_DEAL_FIELDS')?.split(/\s*,\s*/g) ?? []),
   };

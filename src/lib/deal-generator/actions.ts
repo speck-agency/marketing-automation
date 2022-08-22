@@ -295,6 +295,8 @@ export class ActionGenerator {
       appEntitlementId: record.data.appEntitlementId,
       duplicateOf: null,
       maintenanceEndDate: record.data.maintenanceEndDate,
+      billingPeriod:
+      record instanceof Transaction ? record.data.billingPeriod : null,
       appEntitlementNumber: record.data.appEntitlementNumber,
       dealStage,
       amount: (dealStage === DealStage.EVAL
@@ -310,3 +312,4 @@ export class ActionGenerator {
 function getLatestLicense(event: PurchaseEvent): License {
   return [...event.licenses].sort(sorter(item => item.data.maintenanceStartDate, 'DSC'))[0];
 }
+  
