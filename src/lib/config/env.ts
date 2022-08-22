@@ -80,6 +80,7 @@ export function hubspotDealConfigFromENV(): HubspotDealConfig {
       duplicateOf: optional('HUBSPOT_DEAL_DUPLICATEOF_ATTR'),
       maintenanceEndDate: optional('HUBSPOT_DEAL_MAINTENANCE_END_DATE_ATTR'),
       billingPeriod: optional('HUBSPOT_DEAL_Billing_Period'),
+      saleType: optional('HUBSPOT_DEAL_SALE_TYPE_ATTR'),
     },
     managedFields: new Set(optional('HUBSPOT_MANAGED_DEAL_FIELDS')?.split(/\s*,\s*/g) ?? []),
   };
@@ -151,5 +152,5 @@ function requireOneOf<T>(opts: T[]): T {
 
   const { localKey, value } = firstValid;
   return { [localKey]: value } as unknown as T;
+<<<<<<< HEAD
 }
-

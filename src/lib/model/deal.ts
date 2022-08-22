@@ -29,6 +29,7 @@ export type DealData = {
 
   duplicateOf: string | null;
   maintenanceEndDate: string | null;
+  saleType: "Renewal" | "Upgrade" | "New" | "Refund" | null;
   billingPeriod: string | null;
 };
 
@@ -104,6 +105,7 @@ export interface HubspotDealConfig {
     associatedPartner?: string,
     duplicateOf?: string,
     maintenanceEndDate?: string;
+    saleType?: string;
     billingPeriod?: string;
   },
   managedFields?: Set<string>,
@@ -279,6 +281,11 @@ function makeAdapter(config: HubspotDealConfig): EntityAdapter<DealData> {
         down: maintenanceEnd => maintenanceEnd ? maintenanceEnd.substr(0, 10) : null,
         up: maintenanceEnd => maintenanceEnd ?? '',
       },
+      saleType: {
+        property: config.attrs?.saleType,
+        down: (saleType) => saleType as DealData["saleType"],
+        up: (saleType) => saleType ?? "",
+      },
       billingPeriod: {
         property: config.attrs?.billingPeriod,
         down: (billingPeriod) => (billingPeriod ? billingPeriod : null),
@@ -317,5 +324,5 @@ export class DealManager extends EntityManager<DealData, Deal> {
     this.entityAdapter = makeAdapter(config);
   }
 
+<<<<<<< HEAD
 }
-
