@@ -299,6 +299,7 @@ export class ActionGenerator {
       saleType: record instanceof Transaction ? record.data.saleType : null,
       billingPeriod:
       record instanceof Transaction ? record.data.billingPeriod : null,
+      userTier: record.tier,
       appEntitlementNumber: record.data.appEntitlementNumber,
       dealStage,
       amount: (dealStage === DealStage.EVAL
