@@ -80,7 +80,7 @@ export function hubspotDealConfigFromENV(): HubspotDealConfig {
       duplicateOf: optional('HUBSPOT_DEAL_DUPLICATEOF_ATTR'),
       maintenanceEndDate: optional('HUBSPOT_DEAL_MAINTENANCE_END_DATE_ATTR'),
       maintenanceStartDate: optional('HUBSPOT_DEAL_MAINTENANCE_START_DATE_ATTR'),
-      billingPeriod: optional('HUBSPOT_DEAL_Billing_Period'),
+      billingPeriod: optional('HUBSPOT_DEAL_BILLING_PERIOD_ATTR'),
       saleType: optional('HUBSPOT_DEAL_SALE_TYPE_ATTR'),
     },
     managedFields: new Set(optional('HUBSPOT_MANAGED_DEAL_FIELDS')?.split(/\s*,\s*/g) ?? []),
