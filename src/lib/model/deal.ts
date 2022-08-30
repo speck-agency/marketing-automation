@@ -32,6 +32,7 @@ export type DealData = {
   maintenanceStartDate: string | null;
   saleType: "Renewal" | "Upgrade" | "New" | "Refund" | null;
   billingPeriod: string | null;
+  userTier: number | null;
 };
 
 export class Deal extends Entity<DealData> {
@@ -109,6 +110,7 @@ export interface HubspotDealConfig {
     maintenanceStartDate?: string;
     saleType?: string;
     billingPeriod?: string;
+    userTier?: string;
   },
   managedFields?: Set<string>,
 }
@@ -298,6 +300,11 @@ function makeAdapter(config: HubspotDealConfig): EntityAdapter<DealData> {
         property: config.attrs?.billingPeriod,
         down: (billingPeriod) => (billingPeriod ? billingPeriod : null),
         up: (billingPeriod) => billingPeriod ?? "",
+      },
+      userTier: {
+        property: config.attrs?.userTier,
+        down: userTier => userTier ? +userTier : null,
+        up: userTier => userTier?.toFixed() ?? '',
       },
     },
 
