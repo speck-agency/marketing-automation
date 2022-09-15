@@ -6,7 +6,7 @@ import { Transaction } from "../model/transaction";
 import { AttachableError } from '../util/errors';
 import { detailedDiff } from "deep-object-diff";
 
-export function removeApiBorderDuplicates(licenses: readonly License[]) {
+export function removeApiBorderDuplicates(licenses: readonly License[], console: ConsoleLogger) {
   const groups: { [id: string]: License[] } = {};
 
   for (const license of licenses) {
@@ -19,6 +19,7 @@ export function removeApiBorderDuplicates(licenses: readonly License[]) {
   }
 
   // These are created at the very edge of the 2018-07-01 cutoff between with/without attributions
+  const duplicateLicenses: License[] = [];
   const edgeCases = Object.values(groups).filter(ls => ls.length > 1);
   for (const dups of edgeCases) {
     const strippedDups = dups.map(dup => ({
@@ -51,18 +52,26 @@ export function removeApiBorderDuplicates(licenses: readonly License[]) {
           data: a,
           diff,
         };
-        throw new AttachableError('Duplicate deals found at API border', JSON.stringify(json, null, 2));
+         // If duplicate deals exist delete them and push them to duplicateLicenses Array
+        dups.forEach((dup) => duplicateLicenses.push(dup));
+        strippedDups.splice(0);
+        console.printWarning("Double deals", "Duplicate deals found at API border", JSON.stringify(json, null, 2));
+        // throw new AttachableError('Duplicate deals found at API border', JSON.stringify(json, null, 2));
       }
     }
-
     // Keep the first one with attributions
-    dups.sort((a, b) => a.data.evaluationOpportunitySize ? -1 : 1);
-    assert.ok(dups[0].data.evaluationOpportunitySize);
-    dups.length = 1;
+    if (strippedDups.length) {
+      dups.sort((a, b) => a.data.evaluationOpportunitySize ? -1 : 1);
+      assert.ok(dups[0].data.evaluationOpportunitySize);
+      dups.length = 1;
+    }
   }
 
   const fixed = Object.values(groups);
-  assert.ok(fixed.every(ls => ls.length === 1));
+  // Check if duplicate licenses exist and if they do generate array without them
+  const fixedDups = fixed.filter(license => !duplicateLicenses.includes(license[0]));
+  if (fixedDups) assert.ok(fixedDups.every(ls => ls.length === 1));
+  if (!fixedDups) assert.ok(fixed.every(ls => ls.length === 1));
 
   return fixed.map(ls => ls[0]);
 }
