@@ -5,9 +5,11 @@ import { License, LicenseData } from "../model/license";
 import { Transaction } from "../model/transaction";
 import { AttachableError } from '../util/errors';
 import { detailedDiff } from "deep-object-diff";
+import { SlackNotifier } from "../engine/slack-notifier";
 
 export function removeApiBorderDuplicates(licenses: readonly License[], console: ConsoleLogger) {
   const groups: { [id: string]: License[] } = {};
+  const slack =  SlackNotifier.fromENV(console);
 
   for (const license of licenses) {
     if (!groups[license.id]) {
@@ -55,7 +57,8 @@ export function removeApiBorderDuplicates(licenses: readonly License[], console:
          // If duplicate deals exist delete them and push them to duplicateLicenses Array
         dups.forEach((dup) => duplicateLicenses.push(dup));
         strippedDups.splice(0);
-        console.printWarning("Double deals", "Duplicate deals found at API border", JSON.stringify(json, null, 2));
+        console.printWarning("Duplicate Deals", "Duplicate deals found at API border", JSON.stringify(json, null, 2));
+        void slack?.notifyWarning("Duplicate deals found at API border", JSON.stringify(json, null, 2));
         // throw new AttachableError('Duplicate deals found at API border', JSON.stringify(json, null, 2));
       }
     }
