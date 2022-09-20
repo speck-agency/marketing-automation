@@ -54,7 +54,7 @@ export function removeApiBorderDuplicates(licenses: readonly License[], console:
           data: a,
           diff,
         };
-         // If duplicate deals exist delete them and push them to duplicateLicenses Array
+         // Sometimes the APIs return two different versions of a technical contact for the same License at the API border, so we ignore duplicate licenses till API return correct version
         dups.forEach((dup) => duplicateLicenses.push(dup));
         strippedDups.splice(0);
         console.printWarning("Duplicate Deals", "Duplicate deals found at API border", JSON.stringify(json, null, 2));
@@ -71,15 +71,14 @@ export function removeApiBorderDuplicates(licenses: readonly License[], console:
   }
 
   const fixed = Object.values(groups);
-  // Check if duplicate licenses exist and if they do generate array without them
+
   if(duplicateLicenses.length) {
     const fixedDups = fixed.filter(license => !duplicateLicenses.includes(license[0]));
     assert.ok(fixedDups.every(ls => ls.length === 1));
-  } else {
+    return fixedDups.map(ls => ls[0]);
+  } 
     assert.ok(fixed.every(ls => ls.length === 1));
-  }
-
-  return fixed.map(ls => ls[0]);
+    return fixed.map(ls => ls[0]);
 }
 
 export function assertRequiredLicenseFields(license: License) {
