@@ -5,9 +5,11 @@ import { License, LicenseData } from "../model/license";
 import { Transaction } from "../model/transaction";
 import { AttachableError } from '../util/errors';
 import { detailedDiff } from "deep-object-diff";
+import { SlackNotifier } from "../engine/slack-notifier";
 
-export function removeApiBorderDuplicates(licenses: readonly License[]) {
+export function removeApiBorderDuplicates(licenses: readonly License[], console: ConsoleLogger) {
   const groups: { [id: string]: License[] } = {};
+  const slack =  SlackNotifier.fromENV(console);
 
   for (const license of licenses) {
     if (!groups[license.id]) {
@@ -19,6 +21,7 @@ export function removeApiBorderDuplicates(licenses: readonly License[]) {
   }
 
   // These are created at the very edge of the 2018-07-01 cutoff between with/without attributions
+  const duplicateLicenses: License[] = [];
   const edgeCases = Object.values(groups).filter(ls => ls.length > 1);
   for (const dups of edgeCases) {
     const strippedDups = dups.map(dup => ({
@@ -51,20 +54,31 @@ export function removeApiBorderDuplicates(licenses: readonly License[]) {
           data: a,
           diff,
         };
-        throw new AttachableError('Duplicate deals found at API border', JSON.stringify(json, null, 2));
+         // Sometimes the APIs return two different versions of a technical contact for the same License at the API border, so we ignore duplicate licenses till API return correct version
+        dups.forEach((dup) => duplicateLicenses.push(dup));
+        strippedDups.splice(0);
+        console.printWarning("Duplicate Deals", "Duplicate deals found at API border", JSON.stringify(json, null, 2));
+        void slack?.notifyWarning("Duplicate deals found at API border", JSON.stringify(json, null, 2));
+        // throw new AttachableError('Duplicate deals found at API border', JSON.stringify(json, null, 2));
       }
     }
-
     // Keep the first one with attributions
-    dups.sort((a, b) => a.data.evaluationOpportunitySize ? -1 : 1);
-    assert.ok(dups[0].data.evaluationOpportunitySize);
-    dups.length = 1;
+    if (strippedDups.length) {
+      dups.sort((a, b) => a.data.evaluationOpportunitySize ? -1 : 1);
+      assert.ok(dups[0].data.evaluationOpportunitySize);
+      dups.length = 1;
+    }
   }
 
   const fixed = Object.values(groups);
-  assert.ok(fixed.every(ls => ls.length === 1));
 
-  return fixed.map(ls => ls[0]);
+  if(duplicateLicenses.length) {
+    const fixedDups = fixed.filter(license => !duplicateLicenses.includes(license[0]));
+    assert.ok(fixedDups.every(ls => ls.length === 1));
+    return fixedDups.map(ls => ls[0]);
+  } 
+    assert.ok(fixed.every(ls => ls.length === 1));
+    return fixed.map(ls => ls[0]);
 }
 
 export function assertRequiredLicenseFields(license: License) {

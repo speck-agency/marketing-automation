@@ -29,6 +29,14 @@ export class SlackNotifier {
     this.#postToSlack(`Starting Marketing Engine`);
   }
 
+  public async notifyWarning(message: string, attachment: string) {
+    await this.#postToSlack(message);
+    await this.#postAttachmentToSlack({
+      title: 'Warning attachment for ^',
+      content: attachment,
+    })
+  }
+
   public async notifyErrors(loopConfig: RunLoopConfig, errors: any[]) {
     await this.#postToSlack(`Failed ${loopConfig.retryTimes} times. Below are the specific errors, in order. Trying again in ${loopConfig.runInterval}.`);
     for (const error of errors) {
