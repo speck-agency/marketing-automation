@@ -72,9 +72,12 @@ export function removeApiBorderDuplicates(licenses: readonly License[], console:
 
   const fixed = Object.values(groups);
   // Check if duplicate licenses exist and if they do generate array without them
-  const fixedDups = fixed.filter(license => !duplicateLicenses.includes(license[0]));
-  if (fixedDups) assert.ok(fixedDups.every(ls => ls.length === 1));
-  if (!fixedDups) assert.ok(fixed.every(ls => ls.length === 1));
+  if(duplicateLicenses.length) {
+    const fixedDups = fixed.filter(license => !duplicateLicenses.includes(license[0]));
+    assert.ok(fixedDups.every(ls => ls.length === 1));
+  } else {
+    assert.ok(fixed.every(ls => ls.length === 1));
+  }
 
   return fixed.map(ls => ls[0]);
 }
