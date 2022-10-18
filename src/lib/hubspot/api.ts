@@ -1,5 +1,4 @@
 import * as hubspot from '@hubspot/api-client';
-import assert from 'assert';
 import { hubspotCredsFromENV } from '../config/env';
 import { ConsoleLogger } from '../log/console';
 import { KnownError } from '../util/errors';
@@ -9,8 +8,6 @@ import { typedEntries } from './manager';
 
 export type HubspotCreds = {
   accessToken: string,
-} | {
-  apiKey: string,
 };
 
 export default class HubspotAPI {
@@ -31,7 +28,7 @@ export default class HubspotAPI {
       ...entityAdapter.additionalProperties,
     ];
 
-    let associations = ((inputAssociations.length > 0)
+    const associations = ((inputAssociations.length > 0)
       ? inputAssociations
       : undefined);
 
@@ -42,12 +39,9 @@ export default class HubspotAPI {
         properties,
         associations: Object.entries(associations || {})
           .flatMap(([, { results }]) => (
-            results.map(item => {
-              const prefix = `${entityAdapter.kind}_to_`;
-              assert.ok(item.type.startsWith(prefix));
-              const otherKind = item.type.substr(prefix.length) as EntityKind;
-              return `${otherKind}:${item.id}` as RelativeAssociation;
-            })
+            results.map(item =>
+              `${item.type}:${item.id}` as RelativeAssociation
+            )
           )),
       }));
       return normalizedEntities;
@@ -68,7 +62,7 @@ export default class HubspotAPI {
         throw new KnownError(`Hubspot v3 API for "${entityAdapter.kind}" had internal error.`);
       }
       else {
-        throw new Error(`Failed downloading ${entityAdapter.kind}s: ${JSON.stringify(body)}`);
+        throw new Error(`Failed downloading ${entityAdapter.kind}s.\n  Response body: ${JSON.stringify(body)}\n  Error stacktrace: ${e.stack}`);
       }
     }
   }

@@ -220,7 +220,7 @@ export class ActionGenerator {
   maybeMakeMetaAction(event: Exclude<DealRelevantEvent, RefundEvent>, deal: Deal | null, amount: number): Action | null {
     switch (event.meta) {
       case 'archived-app':
-      case 'mass-provider-only':
+      case 'mass-provider-only': {
         const reason = (event.meta === 'archived-app'
           ? 'Archived-app transaction'
           : 'Free-email-provider transaction'
@@ -229,6 +229,7 @@ export class ActionGenerator {
           this.ignore(reason, amount);
         }
         return { type: 'noop', deal, reason: event.meta };
+      }
       default:
         return null;
     }
@@ -280,6 +281,9 @@ export class ActionGenerator {
         ? record.data.saleDate
         : record.data.maintenanceStartDate),
       deployment: record.data.hosting,
+      saleType: (record instanceof Transaction && record.data.saleType !== 'Refund'
+        ? record.data.saleType
+        : null),
       app: record.data.addonKey,
       licenseTier: record.tier,
       country: record.data.country,
@@ -294,7 +298,6 @@ export class ActionGenerator {
       duplicateOf: null,
       maintenanceEndDate: record.data.maintenanceEndDate,
       maintenanceStartDate: record.data.maintenanceStartDate,
-      saleType: record instanceof Transaction ? record.data.saleType : null,
       billingPeriod:
       record instanceof Transaction ? record.data.billingPeriod : null,
       userTier: record.tier,

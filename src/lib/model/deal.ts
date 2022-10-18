@@ -18,6 +18,7 @@ export type DealData = {
   dealName: string;
   origin: string | null;
   deployment: 'Server' | 'Cloud' | 'Data Center' | null;
+  saleType: 'New' | 'Renewal' | 'Upgrade' | null;
   licenseTier: number | null;
   pipeline: Pipeline;
   dealStage: DealStage;
@@ -30,7 +31,6 @@ export type DealData = {
   duplicateOf: string | null;
   maintenanceEndDate: string | null;
   maintenanceStartDate: string | null;
-  saleType: "Renewal" | "Upgrade" | "New" | "Refund" | null;
   billingPeriod: string | null;
   userTier: number | null;
 };
@@ -102,13 +102,13 @@ export interface HubspotDealConfig {
     origin?: string,
     country?: string,
     deployment?: string,
+    saleType?: string,
     licenseTier?: string,
     relatedProducts?: string,
     associatedPartner?: string,
     duplicateOf?: string,
     maintenanceEndDate?: string;
     maintenanceStartDate?: string;
-    saleType?: string;
     billingPeriod?: string;
     userTier?: string;
   },
@@ -238,6 +238,11 @@ function makeAdapter(config: HubspotDealConfig): EntityAdapter<DealData> {
         down: deployment => deployment as DealData['deployment'],
         up: deployment => deployment ?? '',
       },
+      saleType: {
+        property: config.attrs?.saleType,
+        down: sale_type => sale_type as DealData['saleType'],
+        up: saleType => saleType ?? '',
+      },
       licenseTier: {
         property: config.attrs?.licenseTier,
         down: license_tier => license_tier ? +license_tier : null,
@@ -287,19 +292,14 @@ function makeAdapter(config: HubspotDealConfig): EntityAdapter<DealData> {
       },
       maintenanceStartDate: {
         property: config.attrs?.maintenanceStartDate,
-        down: (maintenanceStart) =>
+        down: maintenanceStart =>
           maintenanceStart ? maintenanceStart.substr(0, 10) : null,
-        up: (maintenanceStart) => maintenanceStart ?? "",
-      },
-      saleType: {
-        property: config.attrs?.saleType,
-        down: (saleType) => saleType as DealData["saleType"],
-        up: (saleType) => saleType ?? "",
+        up: maintenanceStart => maintenanceStart ?? "",
       },
       billingPeriod: {
         property: config.attrs?.billingPeriod,
-        down: (billingPeriod) => (billingPeriod ? billingPeriod : null),
-        up: (billingPeriod) => billingPeriod ?? "",
+        down: billingPeriod => (billingPeriod ? billingPeriod : null),
+        up: billingPeriod => billingPeriod ?? "",
       },
       userTier: {
         property: config.attrs?.userTier,
@@ -334,8 +334,8 @@ export class DealManager extends EntityManager<DealData, Deal> {
 
   public duplicates = new Map<Deal, Deal[]>();
 
-  constructor(config: HubspotDealConfig) {
-    super();
+  constructor(typeMappings: Map<string, string>, config: HubspotDealConfig) {
+    super(typeMappings);
     this.entityAdapter = makeAdapter(config);
   }
 

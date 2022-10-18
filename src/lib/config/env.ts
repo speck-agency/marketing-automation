@@ -1,4 +1,3 @@
-import assert from "assert";
 import dotenv from "dotenv";
 import { DataShiftConfig } from "../data-shift/analyze";
 import { EngineConfig } from "../engine/engine";
@@ -16,10 +15,19 @@ export function keepDataSetConfigFromENV() {
 }
 
 export function hubspotCredsFromENV(): HubspotCreds {
-  return requireOneOf([
-    { accessToken: 'HUBSPOT_ACCESS_TOKEN' },
-    { apiKey: 'HUBSPOT_API_KEY' },
-  ]);
+  return {
+    accessToken: required('HUBSPOT_ACCESS_TOKEN'),
+  };
+}
+
+export function hubspotSettingsFromENV() {
+  const typeMappings = optional('HUBSPOT_ASSOCIATION_TYPE_MAPPINGS');
+  return (typeMappings
+    ? new Map(
+      typeMappings
+        .split(',')
+        .map(kv => kv.split(':') as [string, string]))
+    : undefined);
 }
 
 export function mpacCredsFromENV(): MultiMpacCreds {
@@ -69,6 +77,7 @@ export function hubspotDealConfigFromENV(): HubspotDealConfig {
       origin: optional('HUBSPOT_DEAL_ORIGIN_ATTR'),
       country: optional('HUBSPOT_DEAL_COUNTRY_ATTR'),
       deployment: optional('HUBSPOT_DEAL_DEPLOYMENT_ATTR'),
+      saleType: optional('HUBSPOT_DEAL_SALE_TYPE_ATTR'),
       appEntitlementId: required('HUBSPOT_DEAL_APPENTITLEMENTID_ATTR'),
       appEntitlementNumber: required('HUBSPOT_DEAL_APPENTITLEMENTNUMBER_ATTR'),
       addonLicenseId: required('HUBSPOT_DEAL_ADDONLICENESID_ATTR'),
@@ -81,7 +90,6 @@ export function hubspotDealConfigFromENV(): HubspotDealConfig {
       maintenanceEndDate: optional('HUBSPOT_DEAL_MAINTENANCE_END_DATE_ATTR'),
       maintenanceStartDate: optional('HUBSPOT_DEAL_MAINTENANCE_START_DATE_ATTR'),
       billingPeriod: optional('HUBSPOT_DEAL_BILLING_PERIOD_ATTR'),
-      saleType: optional('HUBSPOT_DEAL_SALE_TYPE_ATTR'),
     },
     managedFields: new Set(optional('HUBSPOT_MANAGED_DEAL_FIELDS')?.split(/\s*,\s*/g) ?? []),
   };
@@ -139,18 +147,4 @@ function required(key: string) {
 
 function optional(key: string) {
   return process.env[key];
-}
-
-function requireOneOf<T>(opts: T[]): T {
-  const all = opts.flatMap(opt => Object.entries(opt).map(([localKey, envKey]) => ({
-    localKey,
-    envKey,
-    value: process.env[envKey],
-  })));
-
-  const firstValid = all.find(opt => opt.value);
-  assert.ok(firstValid, `One of ENV keys ${all.map(o => o.envKey).join(' or ')} are required`);
-
-  const { localKey, value } = firstValid;
-  return { [localKey]: value } as unknown as T;
 }

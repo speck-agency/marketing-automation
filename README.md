@@ -69,17 +69,22 @@ $ npm run test -- --watchAll  # Run during dev
 $ node out/bin/main.js  # This always uses live inputs/outputs
 ```
 
-See [Analize Data Shift](./docs/ANALIZE_DATA_SHIFT.md) docs for this sub-functionality.
+See [Analyse Data Shift](./docs/ANALYSE_DATA_SHIFT.md) docs for this sub-functionality.
 
 
 ## Changelog
 
-### Unreleased
+### 0.5.1
+
+- Fixed bug preventing `HUBSPOT_ASSOCIATION_TYPE_MAPPINGS` from being used
+
+### 0.5.0
 
 - Changed Contact 'Deployment' field; see field in [HUBSPOT.md](./docs/HUBSPOT.md) for details
 - Fixed bug that might have prevented some multi-select fields from updating
 - Fixed bug that crashed the engine when deals have duplicates and they all have some manual activity
 - Deprecated `HUBSPOT_API_KEY` in favor of `HUBSPOT_ACCESS_TOKEN` with [private apps](https://developers.hubspot.com/docs/api/migrate-an-api-key-integration-to-a-private-app)
+- Added support for custom HubSpot API associations via ENV variable `HUBSPOT_ASSOCIATION_TYPE_MAPPINGS`
 
 ### 0.4.1
 
