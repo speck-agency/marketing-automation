@@ -107,6 +107,9 @@ export interface RawLicense {
 }
 
 export function getContactInfo(contactInfo: RawLicenseContact | RawTransactionContact): ContactInfo {
+  // In rare cases customer and contact data doesn't exist on the Atlassian Marketplace
+  if(!contactInfo) return {email: 'Unknnown'};  
+
   return {
     email: contactInfo.email,
     name: contactInfo.name,
