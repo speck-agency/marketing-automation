@@ -215,7 +215,7 @@ function makeAdapter(config: HubspotDealConfig): EntityAdapter<DealData> {
       },
       closeDate: {
         property: 'closedate',
-        down: closedate => closedate!.substr(0, 10),
+        down: closedate => closedate ? closedate.substr(0, 10): '',
         up: closeDate => closeDate,
       },
       country: {
