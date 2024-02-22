@@ -52,13 +52,6 @@ export class Table {
     for (let i = 0; i < this.colSpecs.length; i++) {
       cols.push(Math.max(...this.rows.map(row => {
         if(row && row[i]) return row[i].length;
-
-        const console = new ConsoleLogger();
-        const slack =  SlackNotifier.fromENV(console);
-
-        void slack?.notifyWarning("Rows", JSON.stringify(this.rows, null, 2));
-        void slack?.notifyWarning("Row", JSON.stringify(row, null, 2));
-        void slack?.notifyWarning("Cols", JSON.stringify(this.colSpecs, null, 2));
         
         return 0;
       })));
