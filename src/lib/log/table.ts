@@ -1,6 +1,3 @@
-import { SlackNotifier } from "../engine/slack-notifier";
-import { ConsoleLogger } from "./console";
-
 type Row = (string | string[])[];
 
 type ColSpec = {
