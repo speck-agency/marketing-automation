@@ -63,9 +63,8 @@ export class Table {
     };
 
     return this.rows.map(row => {
-      const filteredRow = row.map(el => el);
       const joiner = '   ';
-      const rowString = filteredRow.map((cell, colIndex) => {
+      const rowString = row.map((cell, colIndex) => {
         const alignment = this.colSpecs[colIndex].align ?? 'left';
 
         let cellString = cell;
@@ -75,6 +74,8 @@ export class Table {
             .map(n => ' '.repeat(n) + joiner));
           cellString = cellString.join('\n' + padding);
         }
+
+        if(!cellString) cellString = '';
 
         return padders[alignment](cellString, colIndex);
       }).join(joiner);
