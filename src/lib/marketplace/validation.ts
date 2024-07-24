@@ -91,7 +91,7 @@ export function removeApiBorderDuplicates(licenses: readonly License[], console?
     return fixed.map(ls => ls[0]);
 }
 
-export function assertRequiredLicenseFields(license: License) {
+export function assertRequiredLicenseFields(license: License, console?: ConsoleLogger) {
   validateField(license, license => license.data.addonKey);
   validateField(license, license => license.data.addonName);
   validateField(license, license => license.data.lastUpdated);
@@ -100,7 +100,7 @@ export function assertRequiredLicenseFields(license: License) {
   validateField(license, license => license.data.region);
   // validateField(license, license => license.data.technicalContact);
   // validateField(license, license => license.data.technicalContact.email);
-  validateField(license, license => license.data.tier);
+  validateField(license, license => license.data.tier, undefined, 'license-tier', console);
   validateField(license, license => license.data.licenseType);
   validateField(license, license => license.data.hosting);
   validateField(license, license => license.data.maintenanceStartDate);
@@ -120,7 +120,7 @@ export function assertRequiredTransactionFields(transaction: Transaction) {
   validateField(transaction, transaction => transaction.data.technicalContact);
   validateField(transaction, transaction => transaction.data.technicalContact.email);
   validateField(transaction, transaction => transaction.data.saleDate);
-  validateField(transaction, transaction => transaction.data.tier);
+  // validateField(transaction, transaction => transaction.data.tier);
   validateField(transaction, transaction => transaction.data.licenseType);
   validateField(transaction, transaction => transaction.data.hosting);
   validateField(transaction, transaction => transaction.data.billingPeriod);
@@ -132,8 +132,15 @@ export function assertRequiredTransactionFields(transaction: Transaction) {
   validateField(transaction, transaction => transaction.data.partnerDetails?.billingContact, o => !o || typeof o.email === 'string');
 }
 
-function validateField<T extends Transaction | License, V>(o: T, accessor: (o: T) => V, validator: (o: V) => boolean = o => !!o) {
+function validateField<T extends Transaction | License, V>(o: T, accessor: (o: T) => V, validator: (o: V) => boolean = o => !!o, type?: 'license-tier',  console?: ConsoleLogger) {
   const val = accessor(o);
+
+  if(type === 'license-tier' && !o.data.tier && !val) {
+    const slack =  console ? SlackNotifier.fromENV(console) : null;
+    void slack?.notifyWarning("License tier is not present! License data:", JSON.stringify(o, null, 2));
+    return;
+  }
+
   const path = accessor.toString().replace(/^(\w+) => /, '');
   if (!validator(val)) throw new AttachableError(`Missing field (in ${o.id}): ${path} (found ${JSON.stringify(val)})`, JSON.stringify(o, null, 2));
 }

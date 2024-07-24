@@ -44,7 +44,7 @@ export class Marketplace {
     licenses = licenses.filter(l => validation.hasTechEmail(l, console));
     licenses = validation.removeApiBorderDuplicates(licenses, console);
 
-    licenses.forEach(validation.assertRequiredLicenseFields);
+    licenses.forEach((license) => validation.assertRequiredLicenseFields(license, console));
     transactions.forEach(validation.assertRequiredTransactionFields);
 
     licenses = licenses.filter(emailChecker('License'));

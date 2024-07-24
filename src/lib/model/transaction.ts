@@ -102,6 +102,11 @@ export class Transaction extends MpacRecord<TransactionData> {
   private parseTier() {
     const tier = this.data.tier;
 
+    if (!tier) {
+      console.warn('Transaction tier is not present! Transaction data:', this.data);
+      return -2;
+    }
+
     if (tier === 'Unlimited Users') return 10001;
 
     let m;
