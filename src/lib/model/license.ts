@@ -152,7 +152,7 @@ export class License extends MpacRecord<LicenseData> {
 
     if (!tier) {
       console.warn('License tier is not present! License data:', this.data);
-      return -1;
+      return -2;
     }
 
     switch (tier) {

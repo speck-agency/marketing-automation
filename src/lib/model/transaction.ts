@@ -104,7 +104,7 @@ export class Transaction extends MpacRecord<TransactionData> {
 
     if (!tier) {
       console.warn('Transaction tier is not present! Transaction data:', this.data);
-      return -1;
+      return -2;
     }
 
     if (tier === 'Unlimited Users') return 10001;
