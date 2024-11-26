@@ -8,6 +8,7 @@ import * as validation from "./validation";
 
 export interface MpacConfig {
   ignoredEmails?: Set<string>;
+  emailMappings?: Record<string, string>
 }
 
 export class Marketplace {
@@ -43,12 +44,12 @@ export class Marketplace {
 
     licenses = licenses.filter(l => validation.hasTechEmail(l, console));
     licenses = validation.removeApiBorderDuplicates(licenses, console);
+    
+    licenses = licenses.filter(emailChecker('License'));
+    transactions = transactions.filter(emailChecker('Transaction'));
 
     licenses.forEach((license) => validation.assertRequiredLicenseFields(license, console));
     transactions.forEach(validation.assertRequiredTransactionFields);
-
-    licenses = licenses.filter(emailChecker('License'));
-    transactions = transactions.filter(emailChecker('Transaction'));
 
     const structured = buildAndVerifyStructures(licenses, transactions, console);
     this.licenses = structured.licenses;

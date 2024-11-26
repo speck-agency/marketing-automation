@@ -14,6 +14,10 @@ export function keepDataSetConfigFromENV() {
   return optional('KEEP_DATA_SETS');
 }
 
+export function deleteBlockingDeals() {
+  return optional('DELETE_BLOCKING_DEALS')?.toLowerCase() === 'yes';
+}
+
 export function hubspotCredsFromENV(): HubspotCreds {
   return {
     accessToken: required('HUBSPOT_ACCESS_TOKEN'),
@@ -77,6 +81,7 @@ export function hubspotDealConfigFromENV(): HubspotDealConfig {
       appEntitlementNumber: required('HUBSPOT_DEAL_APPENTITLEMENTNUMBER_ATTR'),
       addonLicenseId: required('HUBSPOT_DEAL_ADDONLICENESID_ATTR'),
       transactionId: required('HUBSPOT_DEAL_TRANSACTIONID_ATTR'),
+      transactionLineItemId: required('HUBSPOT_DEAL_TRANSACTIONLINEITEMID_ATTR'),
       licenseTier: optional('HUBSPOT_DEAL_LICENSE_TIER_ATTR'),
       userTier: optional("HUBSPOT_DEAL_USER_TIER_ATTR"),
       relatedProducts: optional('HUBSPOT_DEAL_RELATED_PRODUCTS_ATTR'),
@@ -111,6 +116,11 @@ export function hubspotContactConfigFromENV(): HubspotContactConfig {
 export function mpacConfigFromENV(): MpacConfig {
   return {
     ignoredEmails: new Set((optional('IGNORED_EMAILS')?.split(',') ?? []).map((e) => e.toLowerCase())),
+    emailMappings: optional('EMAIL_MAPPINGS')?.split(',').reduce((p: Record<string, string>, c: string) => {
+      let mapping = c.split('=')
+      p[mapping[0]] = mapping[1]
+      return p
+    }, {})
   };
 }
 

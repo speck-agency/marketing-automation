@@ -1,4 +1,5 @@
 import { ContactInfo, PartnerInfo } from "../model/record";
+import { mapEmail } from '../engine/contacts/email-mapper'
 
 export type RawTransactionContact = {
   email: string;
@@ -16,6 +17,7 @@ export type RawPartnerDetails = {
 
 export interface RawTransaction {
   transactionId: string;
+  transactionLineItemId: string;
   addonLicenseId?: string;
   licenseId?: string;
   addonKey: string;
@@ -44,7 +46,6 @@ export interface RawTransaction {
 
   appEntitlementId?: string;
   appEntitlementNumber?: string;
-
 }
 
 export type RawLicenseContact = {
@@ -111,7 +112,7 @@ export function getContactInfo(contactInfo: RawLicenseContact | RawTransactionCo
   if(!contactInfo) return {email: 'Unknnown'};  
 
   return {
-    email: contactInfo.email,
+    email: mapEmail(contactInfo.email),
     name: contactInfo.name,
     ...('phone' in contactInfo && { phone: normalizeContactField(contactInfo.phone) }),
     ...('address1' in contactInfo && { address1: normalizeContactField(contactInfo.address1) }),
@@ -133,7 +134,7 @@ export function getPartnerInfo(info: RawPartnerDetails | undefined): PartnerInfo
     partnerName: info.partnerName,
     partnerType: info.partnerType,
     billingContact: {
-      email: info.billingContact.email,
+      email: mapEmail(info.billingContact.email),
       name: info.billingContact.name,
     },
   };
