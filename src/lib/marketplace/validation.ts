@@ -106,7 +106,7 @@ export function assertRequiredLicenseFields(license: License, console?: ConsoleL
   validateField(license, license => license.data.maintenanceStartDate);
   //validateField(license, license => license.data.maintenanceEndDate);
   validateField(license, license => license.data.status);
-  validateField(license, license => license.data.partnerDetails?.billingContact, o => !o || typeof o.email === 'string');
+  // validateField(license, license => license.data.partnerDetails?.billingContact, o => !o || typeof o.email === 'string');
 }
 
 export function assertRequiredTransactionFields(transaction: Transaction) {
@@ -130,7 +130,7 @@ export function assertRequiredTransactionFields(transaction: Transaction) {
   validateField(transaction, transaction => transaction.data.saleType);
   validateField(transaction, transaction => transaction.data.maintenanceStartDate);
   validateField(transaction, transaction => transaction.data.maintenanceEndDate);
-  validateField(transaction, transaction => transaction.data.partnerDetails?.billingContact, o => !o || typeof o.email === 'string');
+  // validateField(transaction, transaction => transaction.data.partnerDetails?.billingContact, o => !o || typeof o.email === 'string');
 }
 
 function validateField<T extends Transaction | License, V>(o: T, accessor: (o: T) => V, validator: (o: V) => boolean = o => !!o, type?: 'license-tier',  console?: ConsoleLogger) {

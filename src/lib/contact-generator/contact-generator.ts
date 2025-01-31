@@ -92,7 +92,7 @@ export class ContactGenerator {
     if (firstName.match(NAME_URL_RE)) firstName = firstName.replace(NAME_URL_RE, '$1_$2');
     if (lastName.match(NAME_URL_RE)) lastName = lastName.replace(NAME_URL_RE, '$1_$2');
 
-    const domain = info.email.split('@')[1];
+    const domain = info.email ? info.email.split('@')[1] : '';
     const contactType: ContactType = (this.partnerDomains.has(domain) ? 'Partner' : 'Customer');
 
     return {
