@@ -164,8 +164,12 @@ export class License extends MpacRecord<LicenseData> {
         return -1;
     }
 
-    const m = tier.match(/^(\d+) Users$/);
-    assert.ok(m, `Unknown license tier: ${tier}`);
+    const m = tier.match(/^(\d+) (Users|Agent)$/);
+
+    if(!m) {
+      console.warn(`Unknown license tier: ${tier}`);
+      return -3;
+    }
 
     return + m[1];
   }
